@@ -22,4 +22,12 @@ async def on_ready():
     print("Bot is connected to Discord")
     await bot.load_extension('cogs.rps')
 
+#sends message for errors
+@bot.event
+async def on_command_error(ctx, error):
+        if str(error) == 'member is a required argument that is missing.':
+            await ctx.channel.send(f'Use ".challenge @member" to challenge a user to a game of "Rock Paper Scissors".')
+        else:
+            await ctx.channel.send(f'poopy')
+
 bot.run(TOKEN)
