@@ -15,8 +15,9 @@ class Buttons(discord.ui.View):
             loser_id = self.challenged_id if winner == self.challenger_id else self.challenger_id
             await self.ctx.send(f"<@{winner}> won!")
             member = self.ctx.guild.get_member(loser_id)
-            if member:  # check if the loser is in a voice channel
+            if self.ctx.author.voice:  # check if the loser is in a voice channel
                 await member.move_to(None)  # kick the loser out of the voice channel
+                await self.ctx.send(f"Kicking <@{loser_id}> from voice channel.")
         else:
             await self.ctx.send("It's a tie.")
 
@@ -55,20 +56,7 @@ class Buttons(discord.ui.View):
         await interaction.response.send_message("you chose rock", ephemeral=True)
         print(f"{interaction.user.id} chose rock")
         if len(self.choices) == 2:
-            print(self.choices)
-            user_1_choice = self.choices.get(self.challenger_id)
-            user_2_choice = self.choices.get(self.challenged_id)
-            winner = None
-            if user_1_choice == user_2_choice:
-                pass  # tie
-            elif (user_1_choice == "rock" and user_2_choice == "scissors") or \
-                 (user_1_choice == "paper" and user_2_choice == "rock") or \
-                 (user_1_choice == "scissors" and user_2_choice == "paper"):
-
-                winner = self.challenger_id
-            else:
-                winner = self.challenged_id
-            await self.announce_winner(winner)
+            await self.check_choices()
 
     @discord.ui.button(label="paper", style=discord.ButtonStyle.green)
     async def paper_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -76,20 +64,7 @@ class Buttons(discord.ui.View):
         await interaction.response.send_message("you chose paper", ephemeral=True)
         print(f"{interaction.user.id} chose paper")
         if len(self.choices) == 2:
-            print(self.choices)
-            user_1_choice = self.choices.get(self.challenger_id)
-            user_2_choice = self.choices.get(self.challenged_id)
-            winner = None
-            if user_1_choice == user_2_choice:
-                pass  # tie
-            elif (user_1_choice == "rock" and user_2_choice == "scissors") or \
-                 (user_1_choice == "paper" and user_2_choice == "rock") or \
-                 (user_1_choice == "scissors" and user_2_choice == "paper"):
-                winner = self.challenger_id
-            else:
-                winner = self.challenged_id
-
-            await self.announce_winner(winner)
+           await self.check_choices()
 
     @discord.ui.button(label="scissors", style=discord.ButtonStyle.red)
     async def scissors_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -97,20 +72,7 @@ class Buttons(discord.ui.View):
         await interaction.response.send_message("you chose scissors", ephemeral=True)
         print(f"{interaction.user.id} chose scissors")
         if len(self.choices) == 2:
-            print(self.choices)
-            user_1_choice = self.choices.get(self.challenger_id)
-            user_2_choice = self.choices.get(self.challenged_id)
-            winner = None
-            if user_1_choice == user_2_choice:
-                pass  # tie
-            elif (user_1_choice == "rock" and user_2_choice == "scissors") or \
-                 (user_1_choice == "paper" and user_2_choice == "rock") or \
-                 (user_1_choice == "scissors" and user_2_choice == "paper"):
-                winner = self.challenger_id
-            else:
-                winner = self.challenged_id
-
-            await self.announce_winner(winner)
+            await self.check_choices()
         
 
 class rps(commands.Cog):
@@ -126,8 +88,7 @@ class rps(commands.Cog):
         challenger_id = ctx.author.id
         challenged_id = member.id
         view = Buttons(ctx, challenger_id, challenged_id)
-        await ctx.send(f"{member.mention} Fight Me", view=view)
-
+        await ctx.send(f"{member.mention} Fight Me", view=view, delete_after=60.0)
 
 
 async def setup(bot):
