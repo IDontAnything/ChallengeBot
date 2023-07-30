@@ -9,7 +9,8 @@ class Buttons(discord.ui.View):
         self.challenged_id = challenged_id
         self.pressed = []
         self.choices = {}
-
+        
+    #announces results
     async def announce_winner(self, winner):
         if winner:
             loser_id = self.challenged_id if winner == self.challenger_id else self.challenger_id
@@ -21,6 +22,7 @@ class Buttons(discord.ui.View):
         else:
             await self.ctx.send("It's a tie.")
 
+    #determines results
     async def check_choices(self):
         if len(self.choices) == 2:
             user_1_choice = self.choices.get(self.challenger_id)
@@ -37,6 +39,7 @@ class Buttons(discord.ui.View):
 
             await self.announce_winner(winner)
 
+    #limits button uses
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id not in [self.challenger_id, self.challenged_id]:
             await interaction.response.send_message("Go Away.", ephemeral=True)
@@ -49,7 +52,7 @@ class Buttons(discord.ui.View):
             print(self.choices)
             return True
 
-
+#button settings
     @discord.ui.button(label="rock", style=discord.ButtonStyle.blurple)
     async def rock_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.choices[interaction.user.id] = 'rock'
@@ -79,10 +82,12 @@ class rps(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    #loads cog
     @commands.Cog.listener()
     async def on_ready(self):
         print('clickme cog loaded')
 
+    #defines command
     @commands.command()
     async def challenge(self, ctx, member: discord.Member):
         challenger_id = ctx.author.id
